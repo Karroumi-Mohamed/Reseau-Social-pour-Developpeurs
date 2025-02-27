@@ -68,4 +68,33 @@ class PostController extends Controller
 
         return redirect()->route('home')->with('success', 'Post updated successfully!');
     }
+
+    public function toggleLike(Post $post)
+    {
+        $like = $post->likes()->where('user_id', auth()->id())->first();
+        
+        if ($like) {
+            $like->delete();
+            $isLiked = false;
+        } else {
+            $post->likes()->create([
+                'user_id' => auth()->id()
+            ]);
+            $isLiked = true;
+        }
+        
+        return response()->json([
+            'success' => true,
+            'likesCount' => $post->likes()->count(),
+            'isLiked' => $isLiked
+        ]);
+    }
+
+    // Method to check if user has liked a post
+    public function checkLike(Post $post)
+    {
+        return response()->json([
+            'isLiked' => $post->likes()->where('user_id', auth()->id())->exists()
+        ]);
+    }
 }
