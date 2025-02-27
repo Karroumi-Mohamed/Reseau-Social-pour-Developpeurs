@@ -13,23 +13,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Scripts -->
-    @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <style>
-        [x-cloak] { 
-            display: none !important; 
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f7f7f7;
-        }
-        .font-header {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-    </style>
+    <!-- Editor.js and plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    
+    <!-- AlpineJS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="antialiased">
+<body class="font-sans antialiased bg-gray-100">
     <!-- Custom Navbar -->
     <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,10 +44,15 @@
                 </div>
 
                 <!-- Right Navigation Links -->
-                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                     @auth
                         <!-- Create Post Button -->
-                        <button id="open-post-modal" class="mr-4 px-4 py-2 bg-gradient-to-r from-blue-600 to-green-500 text-white rounded-md hover:from-blue-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                        <button type="button" 
+                                onclick="openCreatePostModal()"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
                             Create Post
                         </button>
 
@@ -56,12 +61,49 @@
                             <a href="{{ route('profile.show', Auth::user()) }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                                 My Profile
                             </a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
-                                    Log Out
-                                </button>
-                            </form>
+
+                            <!-- Profile Dropdown -->
+                            <div class="ml-3 relative" x-data="{ open: false }">
+                                <div>
+                                    <button @click="open = !open" type="button" class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        @if(Auth::user()->profile_picture)
+                                            <img class="h-8 w-8 rounded-full object-cover" src="{{ Storage::url(Auth::user()->profile_picture) }}" alt="{{ Auth::user()->name }}">
+                                        @else
+                                            <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-sm font-bold">
+                                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                    </button>
+                                </div>
+
+                                <!-- Dropdown menu -->
+                                <div x-show="open" 
+                                     @click.away="open = false"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                     role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95">
+                                    <span class="block px-4 py-2 text-xs text-gray-400">
+                                        {{ Auth::user()->name }}
+                                    </span>
+                                    
+                                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                        Edit Profile
+                                    </a>
+                                    
+                                    <!-- Logout Form -->
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                            Log Out
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
@@ -74,15 +116,13 @@
                 </div>
 
                 <!-- Mobile menu button -->
-                <div class="-mr-2 flex items-center sm:hidden" x-data="{ open: false }">
-                    <button @click="open = !open" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-controls="mobile-menu" aria-expanded="false" x-data="{ open: false }" @click="open = !open">
                         <span class="sr-only">Open main menu</span>
-                        <!-- Icon when menu is closed -->
-                        <svg :class="{'hidden': open, 'block': !open }" class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" x-show="!open">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        <!-- Icon when menu is open -->
-                        <svg :class="{'block': open, 'hidden': !open }" class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" x-show="open">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -91,7 +131,7 @@
         </div>
 
         <!-- Mobile menu -->
-        <div class="sm:hidden" x-show="open" @click.away="open = false">
+        <div class="sm:hidden" id="mobile-menu" x-data="{ open: false }" x-show="open">
             <div class="pt-2 pb-3 space-y-1">
                 @auth
                     <a href="{{ route('profile.show', Auth::user()) }}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
@@ -123,7 +163,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-6">
                 <!-- Left Sidebar - Profile Summary -->
-                @auth
                 <div class="w-full md:w-1/4">
                     <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                         <div class="p-6">
@@ -136,7 +175,7 @@
                                     </div>
                                 @endif
                                 <div>
-                                    <h2 class="text-xl font-header font-semibold text-gray-900">{{ Auth::user()->name }}</h2>
+                                    <h2 class="text-xl font-semibold text-gray-900">{{ Auth::user()->name }}</h2>
                                     <p class="text-sm text-gray-500">{{ Auth::user()->bio ?? 'No bio available' }}</p>
                                 </div>
                             </div>
@@ -201,12 +240,22 @@
                         </div>
                     </div>
                 </div>
-                @endauth
 
                 <!-- Right Content - Posts -->
-                <div class="w-full {{ Auth::check() ? 'md:w-3/4' : 'md:w-2/3 mx-auto' }} space-y-6">
+                <div class="w-full md:w-3/4 space-y-6">
+                    <!-- Create Post Button -->
+                    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+                        <div class="p-6">
+                            <button type="button" 
+                                    onclick="openCreatePostModal()"
+                                    class="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-green-500 text-white rounded-md hover:from-blue-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">
+                                Create a New Post
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Posts List -->
-                    @forelse($posts as $post)
+                    @foreach($posts as $post)
                         <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                             <div class="p-6">
                                 <div class="flex items-center space-x-4 mb-4">
@@ -225,26 +274,26 @@
                                     </div>
                                 </div>
                                 
-                                <h2 class="text-xl font-header font-semibold text-gray-900 mb-2">{{ $post->title }}</h2>
-                                <div class="prose max-w-none mb-4">
-                                    {!! app(\App\Http\Controllers\PostController::class)->renderContent($post->content) !!}
-                                </div>
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ $post->title }}</h2>
+                                
+                                <!-- Post Content -->
+                                <div class="prose max-w-none mb-6 post-content" data-content="{{ $post->content }}"></div>
                                 
                                 @if($post->image)
-                                    <div class="mt-4 mb-4">
-                                        <img src="{{ Storage::url($post->image) }}" alt="Post image" class="rounded-lg max-h-96 w-full object-cover">
+                                    <div class="mt-4 mb-6">
+                                        <img src="{{ Storage::url($post->image) }}" alt="Post image" class="rounded-lg max-h-96 w-auto">
                                     </div>
                                 @endif
                                 
                                 <div class="flex items-center space-x-6 text-sm text-gray-500">
-                                    <button class="flex items-center space-x-2 hover:text-blue-600 transition duration-150">
+                                    <button class="flex items-center space-x-2 hover:text-blue-600">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
                                         <span>{{ $post->likes->count() }} likes</span>
                                     </button>
-                                    <button class="flex items-center space-x-2 hover:text-blue-600 transition duration-150">
+                                    <button class="flex items-center space-x-2 hover:text-blue-600">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -254,77 +303,61 @@
                                 </div>
                             </div>
                         </div>
-                    @empty
-                        <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6 text-center">
-                            <p class="text-gray-500">No posts yet. Be the first to share something!</p>
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Create Post Modal -->
-    <div id="post-modal" 
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto hidden" 
-        aria-labelledby="modal-title" 
-        role="dialog" 
-        aria-modal="true">
-        <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
-                <form id="post-form" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data" class="bg-white">
+    <div id="createPostModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                <form id="createPostForm" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-header font-semibold text-gray-900">Create a Post</h3>
-                            <p class="mt-1 text-sm text-gray-600">Share your thoughts, code snippets, or insights with the community.</p>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                                <input type="text" name="title" id="title" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
-                            </div>
-
-                            <div>
-                                <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
-                                <div id="editor-js" class="mt-1 block w-full min-h-[200px] border border-gray-300 rounded-md"></div>
-                                <input type="hidden" name="content" id="content-input">
-                            </div>
-
-                            <div>
-                                <label for="post-image" class="block text-sm font-medium text-gray-700">Image (optional)</label>
-                                <input type="file" name="post_image" id="post-image" accept="image/*"
-                                    class="mt-1 block w-full text-sm text-gray-500
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-md file:border-0
-                                        file:text-sm file:font-medium
-                                        file:bg-blue-50 file:text-blue-700
-                                        hover:file:bg-blue-100">
-                            </div>
-
-                            <div id="image-preview-container" class="hidden mt-4">
-                                <div class="relative">
-                                    <img id="image-preview" class="max-h-48 rounded-lg">
-                                    <button type="button" id="remove-image"
-                                        class="absolute top-2 right-2 p-1 rounded-full bg-gray-900 bg-opacity-50 text-white hover:bg-opacity-75">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                    <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
+                                    Create New Post
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <input type="text" 
+                                               name="title" 
+                                               id="post_title"
+                                               class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" 
+                                               placeholder="Post title">
+                                    </div>
+                                    <div>
+                                        <div id="editorjs" class="border border-gray-300 rounded-md min-h-[300px] p-4"></div>
+                                        <input type="hidden" name="content" id="content">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Image (optional)
+                                        </label>
+                                        <input type="file" 
+                                               name="post_image" 
+                                               accept="image/*"
+                                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 bg-gray-50">
-                        <button type="submit"
-                            class="inline-flex w-full justify-center rounded-md bg-gradient-to-r from-blue-600 to-green-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-green-600 sm:ml-3 sm:w-auto">
-                            Post
+                    <div class="bg-gray-50 px-6 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" 
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Publish Post
                         </button>
-                        <button type="button" id="close-post-modal"
-                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                        <button type="button" 
+                                onclick="closeCreatePostModal()"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                             Cancel
                         </button>
                     </div>
@@ -350,115 +383,92 @@
     @endif
 
     <script>
-        let editor = null;
-
-        function initEditor() {
-            if (editor) {
-                editor.destroy();
-            }
-
-            editor = new EditorJS({
-                holder: 'editor-js',
-                placeholder: 'What\'s on your mind?',
-                tools: {
-                    header: {
-                        class: Header,
-                        config: {
-                            levels: [2, 3, 4],
-                            defaultLevel: 2
-                        }
-                    },
-                    list: {
-                        class: List,
-                        inlineToolbar: true
-                    },
-                    code: {
-                        class: Code,
-                        config: {
-                            placeholder: 'Enter code here...',
-                            languages: {
-                                javascript: 'JavaScript',
-                                php: 'PHP',
-                                python: 'Python',
-                                java: 'Java',
-                                cpp: 'C++',
-                                csharp: 'C#',
-                                ruby: 'Ruby',
-                                css: 'CSS',
-                                sql: 'SQL',
-                                bash: 'Bash'
-                            }
-                        }
-                    },
-                    paragraph: {
-                        class: Paragraph,
-                        inlineToolbar: true
-                    },
-                    checklist: Checklist,
-                    quote: Quote,
-                    warning: Warning,
-                    marker: Marker,
-                    delimiter: Delimiter
+        // Initialize Editor.js
+        const editor = new EditorJS({
+            holder: 'editorjs',
+            tools: {
+                header: {
+                    class: Header,
+                    inlineToolbar: ['link'],
+                    config: {
+                        placeholder: 'Enter a header',
+                        levels: [2, 3, 4],
+                        defaultLevel: 3
+                    }
+                },
+                list: {
+                    class: List,
+                    inlineToolbar: true
+                },
+                code: {
+                    class: CodeTool,
+                    config: {
+                        placeholder: 'Enter code here'
+                    }
                 }
-            });
+            },
+            placeholder: "What's on your mind?"
+        });
+
+        // Modal functions
+        function openCreatePostModal() {
+            document.getElementById('createPostModal').classList.remove('hidden');
         }
 
-        document.getElementById('open-post-modal').addEventListener('click', function() {
-            document.getElementById('post-modal').classList.remove('hidden');
-            // Initialize editor when modal opens
-            setTimeout(() => {
-                initEditor();
-            }, 100);
-        });
+        function closeCreatePostModal() {
+            document.getElementById('createPostModal').classList.add('hidden');
+        }
 
-        document.getElementById('close-post-modal').addEventListener('click', function() {
-            document.getElementById('post-modal').classList.add('hidden');
-            if (editor) {
-                editor.clear();
-            }
-        });
-
-        // Handle clicking outside modal
-        document.getElementById('post-modal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                this.classList.add('hidden');
-                if (editor) {
-                    editor.clear();
-                }
-            }
-        });
-
-        document.getElementById('post-image').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('image-preview').src = e.target.result;
-                    document.getElementById('image-preview-container').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('remove-image').addEventListener('click', function() {
-            document.getElementById('image-preview').src = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-            document.getElementById('post-image').value = '';
-        });
-
-        document.getElementById('post-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // Handle form submission
+        document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            if (editor) {
-                try {
-                    const data = await editor.save();
-                    document.getElementById('content-input').value = JSON.stringify(data);
-                    this.submit();
-                } catch (error) {
-                    console.error('Error saving post:', error);
-                    alert('Error saving your post. Please try again.');
+            // Save Editor.js content
+            const outputData = await editor.save();
+            document.getElementById('content').value = JSON.stringify(outputData);
+            
+            // Submit the form
+            this.submit();
+        });
+
+        // Render post content
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.post-content').forEach(async function(element) {
+                const content = JSON.parse(element.dataset.content);
+                
+                if (content && content.blocks) {
+                    let html = '';
+                    
+                    for (const block of content.blocks) {
+                        switch (block.type) {
+                            case 'header':
+                                html += `<h${block.data.level} class="text-xl font-bold mb-4">${block.data.text}</h${block.data.level}>`;
+                                break;
+                            case 'paragraph':
+                                html += `<p class="mb-4">${block.data.text}</p>`;
+                                break;
+                            case 'list':
+                                const listType = block.data.style === 'ordered' ? 'ol' : 'ul';
+                                html += `<${listType} class="list-${block.data.style} pl-6 mb-4">`;
+                                block.data.items.forEach(item => {
+                                    html += `<li>${item}</li>`;
+                                });
+                                html += `</${listType}>`;
+                                break;
+                            case 'code':
+                                html += `<pre><code class="language-${block.data.language || 'plaintext'}">${block.data.code}</code></pre>`;
+                                break;
+                        }
+                    }
+                    
+                    element.innerHTML = html;
+                    
+                    // Initialize syntax highlighting
+                    element.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
                 }
-            }
+            });
         });
     </script>
 </body>

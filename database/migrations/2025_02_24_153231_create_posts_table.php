@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
-            $table->text('content');
+            $table->json('content'); // Changed to json for Editor.js content
+            $table->string('image')->nullable(); // Added optional image field
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
