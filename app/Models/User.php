@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'profile_picture',
         'bio',
+        'github_link',
+        'gitlab_link',
     ];
 
     /**
