@@ -22,10 +22,7 @@ class Like extends Model
         return $this->belongsTo(Post::class);
     }
 
-    // Helper method to check if a post is liked by a user
-    public static function isLikedBy($postId, $userId) {
-        return static::where('post_id', $postId)
-                    ->where('user_id', $userId)
-                    ->exists();
-    }
+    
+
+
 }

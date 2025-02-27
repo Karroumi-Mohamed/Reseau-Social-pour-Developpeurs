@@ -29,8 +29,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
-    Route::get('/posts/{post}/check-like', [PostController::class, 'checkLike'])->name('posts.checkLike');
+    Route::get('/posts/{post}/check-like', [PostController::class, 'checkLiked']);
+    Route::Post('/posts/{post}/like', [PostController::class, 'toggleLike']);
 
     // Skills routes
     Route::post('/skills', [SkillController::class, 'store'])->name('skills.store');
