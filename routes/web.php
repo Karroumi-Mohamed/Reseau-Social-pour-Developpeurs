@@ -5,11 +5,17 @@ use App\Http\Controllers\SkillController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Redirect guests to login page
+Route::redirect('/', '/login')->name('root');
+
+// Home route for authenticated users
+Route::get('/home', [HomeController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
@@ -17,6 +23,9 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
     
     Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
+
+    // Posts routes
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 
     // Skills routes
     Route::post('/skills', [SkillController::class, 'store'])->name('skills.store');

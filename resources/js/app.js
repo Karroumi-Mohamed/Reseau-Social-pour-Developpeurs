@@ -1,7 +1,8 @@
 import './bootstrap';
-
 import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
+// Ensure post editor is loaded
+import './post-editor';
 
+window.Alpine = Alpine;
 Alpine.start();
