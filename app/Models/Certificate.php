@@ -8,20 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Certificate extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
         'name',
-        'user_id',
-        'issuer',
+        'issuing_organization',
         'issue_date',
-        'credential_url',
+        'url',
+        'user_id'
     ];
 
     protected $casts = [
         'issue_date' => 'date',
     ];
 
-    public function users()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_certificates');
+        return $this->belongsTo(User::class);
     }
 }

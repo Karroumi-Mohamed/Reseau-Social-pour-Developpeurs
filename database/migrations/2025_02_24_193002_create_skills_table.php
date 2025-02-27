@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('user_skills', function (Blueprint $table) {
+        Schema::create('skill_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('skill_id')->constrained()->cascadeOnDelete();

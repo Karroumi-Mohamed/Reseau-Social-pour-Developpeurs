@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('issuer');
+            $table->string('issuing_organization');
             $table->date('issue_date');
-            $table->string('credential_url')->nullable();
+            $table->string('url')->nullable();
             $table->timestamps();
         });
     }
