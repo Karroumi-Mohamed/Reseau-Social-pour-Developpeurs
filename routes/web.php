@@ -8,13 +8,12 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect guests to login page
 Route::redirect('/', '/login')->name('root');
 
-// Home route for authenticated users
 Route::get('/home', [HomeController::class, 'index'])
     ->middleware(['auth'])
     ->name('home');
@@ -23,10 +22,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    
+
     Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
-    // Posts routes
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -34,36 +32,35 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::get('/posts/{post}/check-like', [PostController::class, 'checkLiked']);
     Route::Post('/posts/{post}/like', [PostController::class, 'toggleLike']);
-    
-    // Comments routes
+
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
-    // Skills routes
     Route::post('/skills', [SkillController::class, 'store'])->name('skills.store');
     Route::delete('/skills/{skill}/remove', [SkillController::class, 'remove'])->name('skills.remove');
 
-    // Languages routes
     Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
     Route::delete('/languages/{language}/remove', [LanguageController::class, 'remove'])->name('languages.remove');
 
-    // Projects routes
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::delete('/projects/{project}/remove', [ProjectController::class, 'remove'])->name('projects.remove');
 
-    // Certificates routes
     Route::post('/certificates', [CertificateController::class, 'store'])->name('certificates.store');
     Route::delete('/certificates/{certificate}/remove', [CertificateController::class, 'remove'])->name('certificates.remove');
 
-    // Notification routes
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
-    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/email', [ProfileController::class, 'updateEmail'])->name('profile.email.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/connections', [ConnectionController::class, 'index'])->name('connections.index');
+    Route::post('/connections/send/{user}', [ConnectionController::class, 'sendRequest'])->name('connections.send');
+    Route::post('/connections/{connection}/accept', [ConnectionController::class, 'accept'])->name('connections.accept');
+    Route::post('/connections/{connection}/reject', [ConnectionController::class, 'reject'])->name('connections.reject');
+    Route::delete('/connections/{connection}/remove', [ConnectionController::class, 'remove'])->name('connections.remove');
 });
 
 require __DIR__.'/auth.php';
