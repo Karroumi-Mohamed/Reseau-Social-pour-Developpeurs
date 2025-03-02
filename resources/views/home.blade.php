@@ -8,38 +8,31 @@
 
     <title>{{ config('app.name', 'DevCommunity') }}</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Editor.js and plugins -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.8.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
 
-    <!-- Highlight.js for code syntax highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
-    <!-- AlpineJS -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="font-sans antialiased bg-gray-100">
-    <!-- Custom Navbar -->
     <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
-                    <!-- Logo -->
                     <div class="shrink-0 flex items-center">
                         <a href="{{ route('home') }}"
                             class="font-header text-xl font-bold bg-gradient-to-r from-blue-600 to-green-500 text-transparent bg-clip-text">
@@ -48,10 +41,8 @@
                     </div>
                 </div>
 
-                <!-- Right Navigation Links -->
                 <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                     @auth
-                        <!-- Create Post Button -->
                         <button type="button" onclick="openCreatePostModal()"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,14 +52,13 @@
                             Create Post
                         </button>
 
-                        <!-- Navigation Links -->
                         <div class="flex space-x-4 items-center">
                             <a href="{{ route('profile.show', Auth::user()) }}"
                                 class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                                 My Profile
                             </a>
 
-                            <!-- Profile Dropdown -->
+                            <x-notification-bell />
                             <div class="ml-3 relative" x-data="{ open: false }">
                                 <div>
                                     <button @click="open = !open" type="button"
@@ -87,7 +77,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Dropdown menu -->
                                 <div x-show="open" @click.away="open = false"
                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                     role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button"
@@ -129,66 +118,13 @@
                         </a>
                     @endauth
                 </div>
-
-                <!-- Mobile menu button -->
-                <div class="-mr-2 flex items-center sm:hidden">
-                    <button type="button"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-                        aria-controls="mobile-menu" aria-expanded="false" x-data="{ open: false }" @click="open = !open">
-                        <span class="sr-only">Open main menu</span>
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" aria-hidden="true" x-show="!open">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" x-show="open">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div class="sm:hidden" id="mobile-menu" x-data="{ open: false }" x-show="open">
-            <div class="pt-2 pb-3 space-y-1">
-                @auth
-                    <a href="{{ route('profile.show', Auth::user()) }}"
-                        class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
-                        My Profile
-                    </a>
-                    <a href="{{ route('profile.edit') }}"
-                        class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
-                        Edit Profile
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="w-full text-left block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
-                            Log Out
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}"
-                        class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
-                        Log in
-                    </a>
-                    <a href="{{ route('register') }}"
-                        class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">
-                        Register
-                    </a>
-                @endauth
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row gap-6">
-                <!-- Left Sidebar - Profile Summary -->
                 <div class="w-full md:w-1/4">
                     <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                         <div class="p-6">
@@ -275,9 +211,7 @@
                     </div>
                 </div>
 
-                <!-- Right Content - Posts -->
                 <div class="w-full md:w-3/4 space-y-6">
-                    <!-- Create Post Button -->
                     <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                         <div class="p-6">
                             <button type="button" onclick="openCreatePostModal()"
@@ -287,7 +221,6 @@
                         </div>
                     </div>
 
-                    <!-- Posts List -->
                     @foreach ($posts as $post)
                         <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                             <div class="p-6">
@@ -310,7 +243,6 @@
 
                                 <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ $post->title }}</h2>
 
-                                <!-- Post Content -->
                                 <div class="prose max-w-none mb-6 post-content" data-content="{{ $post->content }}">
                                 </div>
 
@@ -333,14 +265,49 @@
                                         <span class="likes-count">{{ $post->likes->count() }}</span>
                                         <span>likes</span>
                                     </button>
-                                    <button class="flex items-center space-x-2 hover:text-blue-600">
+                                    <button onclick="toggleComments({{$post->id}})" class="flex items-center space-x-2 hover:text-blue-600">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                         </svg>
-                                        <span>0 comments</span>
+                                        <span class="comments-count">{{ $post->comments->count() }}</span>
+                                        <span>comments</span>
                                     </button>
+                                    
+                                    @if($post->user_id === Auth::id())
+                                    <div class="flex items-center space-x-4 ml-auto">
+                                        <button onclick="editPost({{$post->id}})" class="text-blue-500 hover:text-blue-600">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                        <button onclick="deletePost({{$post->id}})" class="text-red-500 hover:text-red-600">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <div id="comments-section-{{$post->id}}" class="mt-6 pt-6 border-t border-gray-200 hidden">
+                                    <form class="mb-4" onsubmit="submitComment(event, {{$post->id}})">
+                                        <div class="flex space-x-4">
+                                            <input type="text" class="comment-input flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" 
+                                                placeholder="Write a comment...">
+                                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                                                Comment
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div class="space-y-4 comments-container">
+                                        @foreach($post->comments()->orderBy('created_at', 'desc')->get() as $comment)
+                                            @include('components.comment', ['comment' => $comment])
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -418,153 +385,240 @@
 
     <script>
         const editor = new EditorJS({
-            holder: 'editorjs',
-            tools: {
-                header: {
-                    class: Header,
-                    inlineToolbar: ['link'],
-                    config: {
-                        placeholder: 'Enter a header',
-                        levels: [2, 3, 4],
-                        defaultLevel: 3
-                    }
-                },
-                list: {
-                    class: List,
-                    inlineToolbar: true
-                },
-                code: {
-                    class: CodeTool,
-                    config: {
-                        placeholder: 'Enter code here'
-                    }
-                }
-            },
-            placeholder: "What's on your mind?"
-        });
-
-        function openCreatePostModal() {
-            document.getElementById('createPostModal').classList.remove('hidden');
+    holder: 'editorjs',
+    tools: {
+        header: {
+            class: Header,
+            inlineToolbar: ['link'],
+            config: {
+                placeholder: 'Enter a header',
+                levels: [2, 3, 4],
+                defaultLevel: 3
+            }
+        },
+        list: {
+            class: List,
+            inlineToolbar: true
+        },
+        code: {
+            class: CodeTool,
+            config: {
+                placeholder: 'Enter code here'
+            }
         }
+    },
+    placeholder: "What's on your mind?"
+});
 
-        function closeCreatePostModal() {
-            document.getElementById('createPostModal').classList.add('hidden');
-        }
+function openCreatePostModal() {
+    document.getElementById('createPostModal').classList.remove('hidden');
+}
 
-        document.getElementById('createPostForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+function closeCreatePostModal() {
+    document.getElementById('createPostModal').classList.add('hidden');
+}
 
-            const outputData = await editor.save();
-            document.getElementById('content').value = JSON.stringify(outputData);
+document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-            this.submit();
-        });
+    const outputData = await editor.save();
+    document.getElementById('content').value = JSON.stringify(outputData);
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.post-content').forEach(async function(element) {
-                const content = JSON.parse(element.dataset.content);
+    this.submit();
+});
 
-                if (content && content.blocks) {
-                    let html = '';
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.post-content').forEach(async function(element) {
+        const content = JSON.parse(element.dataset.content);
 
-                    for (const block of content.blocks) {
-                        switch (block.type) {
-                            case 'header':
-                                html +=
-                                    `<h${block.data.level} class="text-xl font-bold mb-4">${block.data.text}</h${block.data.level}>`;
-                                break;
-                            case 'paragraph':
-                                html += `<p class="mb-4">${block.data.text}</p>`;
-                                break;
-                            case 'list':
-                                const listType = block.data.style === 'ordered' ? 'ol' : 'ul';
-                                html += `<${listType} class="list-${block.data.style} pl-6 mb-4">`;
-                                block.data.items.forEach(item => {
-                                    html += `<li>${item}</li>`;
-                                });
-                                html += `</${listType}>`;
-                                break;
-                            case 'code':
-                                html +=
-                                    `<pre><code class="language-${block.data.language || 'plaintext'}">${block.data.code}</code></pre>`;
-                                break;
-                        }
-                    }
+        if (content && content.blocks) {
+            let html = '';
 
-                    element.innerHTML = html;
-
-                    element.querySelectorAll('pre code').forEach((block) => {
-                        hljs.highlightElement(block);
-                    });
+            for (const block of content.blocks) {
+                switch (block.type) {
+                    case 'header':
+                        html +=
+                            `<h${block.data.level} class="text-xl font-bold mb-4">${block.data.text}</h${block.data.level}>`;
+                        break;
+                    case 'paragraph':
+                        html += `<p class="mb-4">${block.data.text}</p>`;
+                        break;
+                    case 'list':
+                        const listType = block.data.style === 'ordered' ? 'ol' : 'ul';
+                        html += `<${listType} class="list-${block.data.style} pl-6 mb-4">`;
+                        block.data.items.forEach(item => {
+                            html += `<li>${item}</li>`;
+                        });
+                        html += `</${listType}>`;
+                        break;
+                    case 'code':
+                        html +=
+                            `<pre><code class="language-${block.data.language || 'plaintext'}">${block.data.code}</code></pre>`;
+                        break;
                 }
+            }
+
+            element.innerHTML = html;
+
+            element.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
             });
+        }
+    });
+});
+
+// const response = await fetch(`/posts/${postId}/like`, {
+//             method: 'POST',
+//             headers: {
+//                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+//                 'Accept': 'application/json'
+//             }
+//         });
+
+
+
+addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.like-button').forEach(button => {
+        checkLiked(button.dataset.postId);
+    });
+});
+
+async function toggleLike(postId) {
+    try {
+        const response = await fetch(`/posts/${postId}/like`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
         });
 
-        // const response = await fetch(`/posts/${postId}/like`, {
-        //             method: 'POST',
-        //             headers: {
-        //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        //                 'Accept': 'application/json'
-        //             }
-        //         });
+        const data = await response.json();
 
-
-
-        addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.like-button').forEach(button => {
-                checkLiked(button.dataset.postId);
-            });
-        });
+        const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+        const icon = button.querySelector('.like-icon');
+        const count = button.querySelector('.likes-count')
         
-        async function toggleLike(postId) {
-            try {
-                const response = await fetch(`/posts/${postId}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    }
-                });
 
-                const data = await response.json();
+        count.textContent = data.likesCount;
+        if (data.isLiked) {
+            icon.style.fill = 'currentColor'
+        } else {
+            icon.style.fill = 'none'
+        }
+        
+        
 
-                const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
-                const icon = button.querySelector('.like-icon');
-                const count = button.querySelector('.likes-count')
-                
+    } catch (error) {
+        console.error('error checking if liked', error);
 
-                count.textContent = data.likesCount;
-                if (data.isLiked) {
-                    icon.style.fill = 'currentColor'
-                } else {
-                    icon.style.fill = 'none'
-                }
-                
-                
+    }
+}
 
-            } catch (error) {
-                console.error('error checking if liked', error);
+async function checkLiked(postId) {
+    try {
+        const response = await fetch(`/posts/${postId}/check-like`);
+        const data = await response.json();
 
-            }
+        const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+        const icon = button.querySelector('.like-icon');
+
+        if (data.isLiked) {
+            icon.style.fill = 'currentColor'
         }
 
-        async function checkLiked(postId) {
-            try {
-                const response = await fetch(`/posts/${postId}/check-like`);
-                const data = await response.json();
+    } catch (error) {
+        console.error('error checking if liked', error);
 
-                const button = document.querySelector(`.like-button[data-post-id="${postId}"]`);
-                const icon = button.querySelector('.like-icon');
+    }
+}
 
-                if (data.isLiked) {
-                    icon.style.fill = 'currentColor'
-                }
+async function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-section-${postId}`);
+    commentsSection.classList.toggle('hidden');
+}
 
-            } catch (error) {
-                console.error('error checking if liked', error);
+async function submitComment(event, postId) {
+    event.preventDefault();
+    const form = event.target;
+    const input = form.querySelector('.comment-input');
+    const content = input.value.trim();
+    
+    if (!content) return;
 
-            }
+    try {
+        const response = await fetch(`/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const commentsContainer = form.closest('#comments-section-' + postId).querySelector('.comments-container');
+            
+            commentsContainer.insertAdjacentHTML('afterbegin', data.commentHtml);
+            
+            const commentsCountElement = document.querySelector(`button[onclick="toggleComments(${postId})"] .comments-count`);
+            commentsCountElement.textContent = data.commentsCount;
+            
+            input.value = '';
         }
+    } catch (error) {
+        console.error('Error submitting comment:', error);
+    }
+}
+
+async function deleteComment(commentId, postId) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    try {
+        const response = await fetch(`/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // Remove the comment element
+            document.getElementById(`comment-${commentId}`).remove();
+            
+            // Update comments count
+            const commentsCountElement = document.querySelector(`button[onclick="toggleComments(${postId})"] .comments-count`);
+            commentsCountElement.textContent = data.commentsCount;
+        }
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+    }
+}
+
+async function editPost(postId) {
+    window.location.href = `/posts/${postId}/edit`;
+}
+
+async function deletePost(postId) {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+        const response = await fetch(`/posts/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Error deleting post:', error);
+    }
+}
     </script>
 </body>
 

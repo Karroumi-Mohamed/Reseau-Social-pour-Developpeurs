@@ -7,6 +7,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect guests to login page
@@ -29,8 +31,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::get('/posts/{post}/check-like', [PostController::class, 'checkLiked']);
     Route::Post('/posts/{post}/like', [PostController::class, 'toggleLike']);
+    
+    // Comments routes
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
     // Skills routes
     Route::post('/skills', [SkillController::class, 'store'])->name('skills.store');
@@ -47,6 +54,10 @@ Route::middleware(['auth'])->group(function () {
     // Certificates routes
     Route::post('/certificates', [CertificateController::class, 'store'])->name('certificates.store');
     Route::delete('/certificates/{certificate}/remove', [CertificateController::class, 'remove'])->name('certificates.remove');
+
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -25,7 +25,7 @@ class ProjectController extends Controller
         if ($project->user_id !== auth()->id()) {
             abort(403);
         }
-
+        
         $project->delete();
 
         return back()->with('success', 'Project removed successfully.');

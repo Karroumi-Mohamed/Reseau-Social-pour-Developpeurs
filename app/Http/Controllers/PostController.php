@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Notifications\PostLikedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use function Pest\Laravel\post;
 
 class PostController extends Controller
@@ -70,22 +73,29 @@ class PostController extends Controller
         return redirect()->route('home')->with('success', 'Post updated successfully!');
     }
 
-    public function toggleLike(Post $post){
-        $like = $post->likes()->where('user_id',auth()->id())->first();
+    public function toggleLike(Post $post): JsonResponse
+    {
+        $like = $post->likes()->where('user_id', auth()->id())->first();
 
-        if ($like){
+        if ($like) {
             $like->delete();
             $isLiked = false;
         } else {
             $post->likes()->create([
                 'user_id' => auth()->id(),
             ]);
+            
+            // Send notification to post owner if the liker is not the post owner
+            if ($post->user_id !== auth()->id()) {
+                $post->user->notify(new PostLikedNotification($post, auth()->user()));
+            }
+            
             $isLiked = true;
         }
 
         return response()->json([
-            'success' =>true,
-            'likesCount' =>$post->likes()->count(),
+            'success' => true,
+            'likesCount' => $post->likes()->count(),
             'isLiked' => $isLiked
         ]);
     }
@@ -93,6 +103,24 @@ class PostController extends Controller
     public function checkLiked(Post $post){
         return response()->json([
             'isLiked' =>  $post->likes()->where('user_id',auth()->id())->exists(),
+        ]);
+    }
+
+    public function destroy(Post $post): JsonResponse
+    {
+        if ($post->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Delete post image if exists
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'message' => 'Post deleted successfully'
         ]);
     }
 }
