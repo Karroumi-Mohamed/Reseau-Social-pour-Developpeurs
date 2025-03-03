@@ -29,7 +29,22 @@
             z-index: -1;
             pointer-events: none;
         }
+        .content-fade {
+            position: relative;
+            max-height: 100px;
+            overflow: hidden;
+        }
+        .content-fade::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(249, 250, 251, 0), rgba(249, 250, 251, 1));
+        }
     </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -38,11 +53,11 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center space-x-4">
-                        <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-150">
+                        <a href="{{ route('home') }}" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                             </svg>
-                            {{ __('Back to Dashboard') }}
+                            {{ __('Back to Home') }}
                         </a>
                         <span class="text-xl font-header font-bold bg-gradient-to-r from-blue-600 to-green-500 text-transparent bg-clip-text">Dev Community</span>
                     </div>
@@ -92,6 +107,9 @@
                                 <p class="mt-2 text-lg text-gray-600">{{ $user->bio ?? 'No bio available' }}</p>
                             </div>
                             <div class="mt-4 md:mt-0 flex space-x-4">
+                                @if(Auth::id() !== $user->id)
+                                    <x-connection-button :user="$user" />
+                                @endif
                                 @if($user->github_link)
                                     <a href="{{ $user->github_link }}" target="_blank" class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition duration-150">
                                         <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -237,7 +255,7 @@
                     @forelse($user->posts as $post)
                         <div class="bg-gray-50 rounded-lg p-6 border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-2">{{ $post->title }}</h3>
-                            <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
+                            <div class="content-fade prose max-w-none text-gray-600 mb-4 post-content-preview" data-content="{{ $post->content }}"></div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-6 text-sm text-gray-500">
                                     <span class="flex items-center">
@@ -259,7 +277,7 @@
                                         {{ $post->comments->count() }} comments
                                     </span>
                                 </div>
-                                <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition duration-150 flex items-center">
+                                <a href="{{ route('posts.show', $post) }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition duration-150 flex items-center">
                                     Read More
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -274,5 +292,75 @@
             </div>
         </div>
     </div>
+    
+    @if (session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition:enter="transform ease-out duration-300 transition"
+            x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+            x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" x-init="setTimeout(() => show = false, 3000)"
+            class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div x-data="{ show: true }" x-show="show" x-transition:enter="transform ease-out duration-300 transition"
+            x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+            x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" x-init="setTimeout(() => show = false, 3000)"
+            class="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+            {{ session('error') }}
+        </div>
+    @endif
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.post-content-preview').forEach(async function(element) {
+                try {
+                    const content = JSON.parse(element.dataset.content);
+                    if (content && content.blocks) {
+                        let html = '';
+                        let textCount = 0;
+                        const maxChars = 150; // Maximum characters to show
+                        
+                        // Process only a few blocks to keep it short
+                        for (const block of content.blocks) {
+                            if (textCount >= maxChars) break;
+                            
+                            switch (block.type) {
+                                case 'paragraph':
+                                    const text = block.data.text;
+                                    const remainingChars = maxChars - textCount;
+                                    const displayText = text.length > remainingChars 
+                                        ? text.substring(0, remainingChars) + '...' 
+                                        : text;
+                                    
+                                    html += `<p>${displayText}</p>`;
+                                    textCount += text.length;
+                                    break;
+                                    
+                                case 'header':
+                                    if (textCount < maxChars) {
+                                        const headerText = block.data.text;
+                                        html += `<h${block.data.level} class="font-bold mb-2">${headerText}</h${block.data.level}>`;
+                                        textCount += headerText.length;
+                                    }
+                                    break;
+                            }
+                        }
+                        
+                        element.innerHTML = html || '<p class="text-gray-500">No content available</p>';
+                    } else {
+                        element.innerHTML = '<p class="text-gray-500">No content available</p>';
+                    }
+                } catch (error) {
+                    console.error('Error parsing post content:', error);
+                    element.innerHTML = '<p class="text-gray-500">Error displaying content</p>';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

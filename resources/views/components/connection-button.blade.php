@@ -30,14 +30,12 @@
         <div class="flex space-x-2">
             <form action="{{ route('connections.accept', $connection) }}" method="POST">
                 @csrf
-                @method('PATCH')
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md">
                     Accept
                 </button>
             </form>
             <form action="{{ route('connections.reject', $connection) }}" method="POST">
                 @csrf
-                @method('PATCH')
                 <button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">
                     Reject
                 </button>

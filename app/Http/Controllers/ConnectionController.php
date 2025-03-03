@@ -39,7 +39,7 @@ class ConnectionController extends Controller
 
     public function sendRequest(User $user) {
         $sender = Auth::user();
-
+        
         $existingConnection = Connection::where(function ($query) use ($sender, $user) {
             $query->where('sender_id', $sender->id)
                 ->where('receiver_id', $user->id);
@@ -48,11 +48,9 @@ class ConnectionController extends Controller
                 ->where('receiver_id', $sender->id);
         })->first();
 
-
         if ($existingConnection) {
             return redirect()->back()->with('error', 'Connection request already sent');
         }
-
 
         $connection = Connection::create([
             'sender_id' => $sender->id,
@@ -60,11 +58,12 @@ class ConnectionController extends Controller
             'status' => 'pending'
         ]);
 
-
         $user->notify(new ConnectionRequestNotification($sender));
+
         return redirect()->back()->with('success', 'Connection request sent');
     }
-    public function acceptRequest(Connection $connection) {
+
+    public function accept(Connection $connection) {
         if ($connection->receiver_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
@@ -74,10 +73,11 @@ class ConnectionController extends Controller
         ]);
 
         $connection->sender->notify(new ConnectionAcceptedNotification(Auth::user()));
+
         return redirect()->back()->with('success', 'Connection request accepted');
     }
 
-    public function rejectRequest(Connection $connection) {
+    public function reject(Connection $connection) {
         if ($connection->receiver_id !== Auth::id()) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
@@ -89,13 +89,16 @@ class ConnectionController extends Controller
         return redirect()->back()->with('success', 'Connection request rejected');
     }
 
-    public function cancelRequest(Connection $connection) {
-        if ($connection->sender_id !== Auth::id() && $connection->status !== 'pending') {
+    public function remove(Connection $connection) {
+        $user = Auth::user();
+        
+        // Check if user is part of this connection
+        if ($connection->sender_id !== $user->id && $connection->receiver_id !== $user->id) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
 
         $connection->delete();
 
-        return redirect()->back()->with('success', 'Connection request cancelled');
+        return redirect()->back()->with('success', 'Connection removed');
     }
 }
