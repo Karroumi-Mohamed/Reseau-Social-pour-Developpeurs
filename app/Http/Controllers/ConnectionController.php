@@ -23,7 +23,6 @@ class ConnectionController extends Controller
             ->with(['sender', 'receiver'])
             ->get()
             ->map(function ($connection) use ($user) {
-                // Determine the connected user (not the current user)
                 $connectedUser = $connection->sender_id == $user->id
                     ? $connection->receiver
                     : $connection->sender;
@@ -39,7 +38,7 @@ class ConnectionController extends Controller
 
     public function sendRequest(User $user) {
         $sender = Auth::user();
-        
+
         $existingConnection = Connection::where(function ($query) use ($sender, $user) {
             $query->where('sender_id', $sender->id)
                 ->where('receiver_id', $user->id);
@@ -91,8 +90,7 @@ class ConnectionController extends Controller
 
     public function remove(Connection $connection) {
         $user = Auth::user();
-        
-        // Check if user is part of this connection
+
         if ($connection->sender_id !== $user->id && $connection->receiver_id !== $user->id) {
             return redirect()->back()->with('error', 'Unauthorized');
         }
