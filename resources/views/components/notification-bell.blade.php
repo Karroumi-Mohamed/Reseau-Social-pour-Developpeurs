@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let notifications = [];
     let isOpen = false;
 
-    // Toggle dropdown
     bellButton.addEventListener('click', () => {
         if (isOpen) {
             hideDropdown();
@@ -45,14 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', (event) => {
         if (!bellContainer.contains(event.target) && isOpen) {
             hideDropdown();
         }
     });
 
-    // Mark all as read
     markAllReadButton.addEventListener('click', markAllAsRead);
 
     function showDropdown() {
@@ -89,10 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Show mark all as read button
         markAllContainer.classList.remove('hidden');
         
-        // Render each notification
         notifications.forEach(notification => {
             const notificationEl = document.createElement('div');
             notificationEl.className = `px-4 py-3 hover:bg-gray-50 ${!notification.read_at ? 'bg-blue-50' : ''}`;
@@ -114,13 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .then(() => {
-            // Update UI to show all notifications as read
             notifications.forEach(notification => {
                 notification.read_at = new Date().toISOString();
             });
             renderNotifications();
             
-            // Remove the unread indicator
             const unreadIndicator = document.getElementById('notification-unread-indicator');
             if (unreadIndicator) {
                 unreadIndicator.remove();
