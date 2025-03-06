@@ -31,4 +31,19 @@ class ConnectionAcceptedNotification extends Notification
             'receiver_name' => $this->receiver->name,
         ];
     }
+
+    public function toDatabase($notifiable)
+    {
+        return $this->toArray($notifiable);
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function broadcastType(): string
+    {
+        return 'connection_accepted';
+    }
 }

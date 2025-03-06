@@ -15,9 +15,9 @@ window.Echo.private(`App.Models.User.${userId}`)
     .notification((notification) => {
         console.log(notification);
 
-        switch (notification.type) {
-            case 'post_liked':
-                alert('Post liked', notification.message);
-                break;
+        if (typeof fetchNotifications === 'function') {
+            alert('Post liked');
+            fetchNotifications();
         }
+        alert('Post liked');
     });

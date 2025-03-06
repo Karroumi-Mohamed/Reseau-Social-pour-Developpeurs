@@ -19,7 +19,7 @@ class ConnectionRequestNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     public function toArray($notifiable)
@@ -30,5 +30,20 @@ class ConnectionRequestNotification extends Notification
             'sender_id' => $this->sender->id,
             'sender_name' => $this->sender->name,
         ];
+    }
+
+    public function toDatabase($notifiable)
+    {
+        return $this->toArray($notifiable);
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function broadcastType(): string
+    {
+        return 'connection_request';
     }
 }

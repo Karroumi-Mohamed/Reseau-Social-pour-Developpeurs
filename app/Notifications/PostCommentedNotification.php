@@ -24,7 +24,7 @@ class PostCommentedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     public function toDatabase(object $notifiable): array
@@ -37,5 +37,23 @@ class PostCommentedNotification extends Notification implements ShouldQueue
             'comment_id' => $this->comment->id,
             'title' => $this->comment->post->title
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'message' => $this->user->name . ' commented on your post',
+            'post_id' => $this->comment->post_id,
+            'user_id' => $this->user->id,
+            'type' => 'post_commented',
+            'comment_id' => $this->comment->id,
+            'title' => $this->comment->post->title
+        ]);
+    }
+
+
+    public function broadcastType(): string
+    {
+        return 'post_commented';
     }
 }
