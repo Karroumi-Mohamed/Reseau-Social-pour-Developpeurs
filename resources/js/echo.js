@@ -13,11 +13,8 @@ window.Echo = new Echo({
 const userId = document.querySelector('meta[name="user-id"]').content;
 window.Echo.private(`App.Models.User.${userId}`)
     .notification((notification) => {
-        console.log(notification);
 
         if (typeof fetchNotifications === 'function') {
-            alert('Post liked');
             fetchNotifications();
         }
-        alert('Post liked');
     });
