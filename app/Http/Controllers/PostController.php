@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Hashtag;
 use App\Notifications\PostLikedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -19,6 +20,7 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|json', // Editor.js outputs JSON
             'post_image' => 'nullable|image|max:5120', // 5MB max
+            'hashtags' => 'nullable|string', // Hashtags field
         ]);
 
         $post = new Post();
@@ -33,6 +35,11 @@ class PostController extends Controller
         }
 
         $post->save();
+        
+        // Process hashtags
+        if (!empty($validated['hashtags'])) {
+            $this->processHashtags($post, $validated['hashtags']);
+        }
 
         return redirect()->route('home')->with('success', 'Post created successfully!');
     }
@@ -54,6 +61,7 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|json', // Editor.js outputs JSON
             'post_image' => 'nullable|image|max:5120',
+            'hashtags' => 'nullable|string', // Hashtags field
         ]);
 
         $post->title = $validated['title'];
@@ -69,8 +77,47 @@ class PostController extends Controller
         }
 
         $post->save();
+        
+        // Process hashtags - first detach existing ones
+        $post->hashtags()->detach();
+        
+        // Then process new ones if any
+        if (!empty($validated['hashtags'])) {
+            $this->processHashtags($post, $validated['hashtags']);
+        }
 
         return redirect()->route('home')->with('success', 'Post updated successfully!');
+    }
+
+    /**
+     * Process hashtags and attach them to a post
+     */
+    private function processHashtags(Post $post, string $hashtagsString): void
+    {
+        // Extract hashtags - match words starting with #
+        preg_match_all('/#(\w+)/', $hashtagsString, $matches);
+        
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $tag) {
+                // Find or create the hashtag
+                $hashtag = Hashtag::firstOrCreate(['name' => strtolower($tag)]);
+                // Attach hashtag to post if not already attached
+                if (!$post->hashtags->contains($hashtag->id)) {
+                    $post->hashtags()->attach($hashtag->id);
+                }
+            }
+        }
+    }
+
+    /**
+     * Display posts with a specific hashtag
+     */
+    public function byHashtag(string $hashtag)
+    {
+        $hashtag = Hashtag::where('name', strtolower($hashtag))->firstOrFail();
+        $posts = $hashtag->posts()->with('user', 'likes', 'comments')->latest()->paginate(10);
+        
+        return view('posts.hashtag', compact('posts', 'hashtag'));
     }
 
     public function toggleLike(Post $post): JsonResponse
@@ -116,6 +163,9 @@ class PostController extends Controller
         if ($post->image) {
             Storage::disk('public')->delete($post->image);
         }
+
+        // Detach hashtags before deleting post
+        $post->hashtags()->detach();
 
         $post->delete();
 

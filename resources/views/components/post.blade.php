@@ -32,6 +32,16 @@
                     class="rounded-lg max-h-96 w-auto">
             </div>
         @endif
+        @if($post->hashtags->isNotEmpty())
+            <div class="flex flex-wrap gap-2 mb-4">
+                @foreach($post->hashtags as $hashtag)
+                    <a href="{{ route('posts.hashtag', $hashtag->name) }}" 
+                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+                        #{{ $hashtag->name }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
         <div class="flex items-center space-x-6 text-sm text-gray-500">
             <button onclick="toggleLike({{$post->id}})"
                 class="like-button flex items-center space-x-2 hover:text-blue-600"

@@ -34,7 +34,7 @@ class Post extends Model
     }
 
     public function hashtags() {
-        return $this->belongsToMany(Hashtag::class);
+        return $this->belongsToMany(Hashtag::class, 'hashtag_post');
     }
 
     // Helper method to get plain text content

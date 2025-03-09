@@ -26,6 +26,14 @@
                                     <input type="hidden" name="content" id="content">
                                 </div>
                                 <div>
+                                    <label for="hashtags" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Hashtags
+                                    </label>
+                                    <input type="text" name="hashtags" id="hashtags" 
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                        placeholder="Add hashtags (separate with spaces: #coding #laravel #webdev)">
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">
                                         Image (optional)
                                     </label>

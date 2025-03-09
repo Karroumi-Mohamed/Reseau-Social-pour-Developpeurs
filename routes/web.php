@@ -61,6 +61,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/connections/{connection}/accept', [ConnectionController::class, 'accept'])->name('connections.accept');
     Route::post('/connections/{connection}/reject', [ConnectionController::class, 'reject'])->name('connections.reject');
     Route::delete('/connections/{connection}/remove', [ConnectionController::class, 'remove'])->name('connections.remove');
+
+    // Hashtag routes
+    Route::get('/hashtag/{hashtag}', [PostController::class, 'byHashtag'])->name('posts.hashtag');
 });
 
 require __DIR__.'/auth.php';
