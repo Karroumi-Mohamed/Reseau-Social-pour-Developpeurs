@@ -10,6 +10,22 @@
             </div>
             <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                 @auth
+                    <div class="hidden sm:flex flex-1 justify-center px-4">
+                <form action="{{ route('search') }}" method="GET" class="w-96">
+                    <div class="relative">
+                        <input type="text" 
+                            name="q" 
+                            value="{{ request('q') }}"
+                            placeholder="Search users and posts..."
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 text-sm">
+                        <button type="submit" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-blue-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
                     <button type="button" onclick="openCreatePostModal()"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -10,6 +10,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('root');
@@ -62,8 +63,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/connections/{connection}/reject', [ConnectionController::class, 'reject'])->name('connections.reject');
     Route::delete('/connections/{connection}/remove', [ConnectionController::class, 'remove'])->name('connections.remove');
 
-    // Hashtag routes
     Route::get('/hashtag/{hashtag}', [PostController::class, 'byHashtag'])->name('posts.hashtag');
+
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
 });
 
 require __DIR__.'/auth.php';

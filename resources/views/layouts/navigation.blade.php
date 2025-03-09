@@ -21,6 +21,24 @@
                 </div>
             </div>
 
+            <!-- Search Bar -->
+            <div class="hidden sm:flex flex-1 justify-center px-4">
+                <form action="{{ route('search') }}" method="GET" class="w-96">
+                    <div class="relative">
+                        <input type="text" 
+                            name="q" 
+                            value="{{ request('q') }}"
+                            placeholder="Search users and posts..."
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 text-sm">
+                        <button type="submit" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-blue-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
@@ -69,6 +87,24 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <!-- Mobile Search Form -->
+        <div class="pt-2 pb-3 px-4">
+            <form action="{{ route('search') }}" method="GET">
+                <div class="relative">
+                    <input type="text" 
+                        name="q" 
+                        value="{{ request('q') }}"
+                        placeholder="Search users and posts..."
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 text-sm">
+                    <button type="submit" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Home') }}
