@@ -1,3 +1,5 @@
+@props(['comment'])
+
 <div class="flex space-x-3 comment-item" id="comment-{{$comment->id}}">
     <a href="{{ route('profile.show', $comment->user) }}" class="flex-shrink-0">
         @if($comment->user->profile_picture)
